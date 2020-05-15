@@ -1,4 +1,8 @@
 from room import Room
+from player import Player
+from item import Item
+# will make everything look clean
+import textwrap
 
 # Declare all the rooms
 
@@ -39,6 +43,33 @@ room['treasure'].s_to = room['narrow']
 
 # Make a new player object that is currently in the 'outside' room.
 
+player = Player(input(
+    'This game is crazy!  Create a name for your player'), room['outside'])
+
+full_direction = {  # general directions created
+    "n": "North",
+    "e": "East",
+    "s": "South",
+    "w": "West",
+}
+
+
+def next_room(dir, current_room):
+    direction = dir + "_to"
+    return getattr(current_room, direction)
+
+
+def move_player(ply, dir):
+    room = next_room(dir, ply.current_room)
+    if room:
+        ply.current_room = room
+        print(
+            f"You move {full_direction[dir]} and find yourself in a new place")
+        return True
+    else:
+        return False
+
+
 # Write a loop that:
 #
 # * Prints the current room name
@@ -49,3 +80,65 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+
+def center_wrap(text, cwidth=90, **kw):
+    lines = textwrap.wrap(text, **kw)
+    return "\n".join(line.center(cwidth) for line in lines)
+
+
+def center_print(obj):
+    lines = str(obj).splitlines()
+    for line in lines:
+        print(center_wrap(line, cwidth=100, width=65))
+
+
+done = False
+help_folkes = """
+
+Commands:
+    n, e, s, w - to move in a direction domain_specified
+    get/take [ITEM NAME] - pickup item
+    drop [ITEM NAME] - drop item
+    i/inventory - list all items inventory
+    quit - to quit the game
+    help - to view these commands again
+"""
+print(f""" 
+      Welcome {player.name}!
+      {help_folkes}
+""")
+
+while not done:
+    center_print(player.current_room)
+    commands = input("Where do you wanna go? ").strip().lower().split(" ")
+    if commands[0] in ["n", "e", "s", "w"]:
+        if move_player(player, commands[0]):
+            continue
+        else:
+            print("this is a weird room")
+            continue
+    elif commands[0] in ["take", "give"]:
+        inv = player.pickup_item(commands[1])
+        if not inv:
+            print(
+                f"You tried to find a {commands[1]}, unfortunately you don't have it"
+            )
+            continue
+    elif commands[0] == "drop":
+        item = player.drop_item(commands[1])
+        if not item:
+            print(f"You don't have a {commands[1]} on you")
+            continue
+    elif commands[0] in ["i", "inventory"]:
+        center_print(player.inventory_string())
+        continue
+    elif commands[0] == "quit":
+        done = True
+        continue
+    elif commands[0] == "help":
+        print(help_folkes)
+        continue
+    else:
+        print("Invalid Command")
+        continue

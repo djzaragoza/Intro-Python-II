@@ -1,4 +1,8 @@
 from room import Room
+from player import Player
+from item import Item
+# will make everything look clean
+import textwrap
 
 # Declare all the rooms
 
@@ -38,6 +42,33 @@ room['treasure'].s_to = room['narrow']
 #
 
 # Make a new player object that is currently in the 'outside' room.
+
+player = Player(input(
+    'This game is crazy!  Create a name for your player'), room['outside'])
+
+full_direction = {  # general directions created
+    "n": "North",
+    "e": "East",
+    "s": "South",
+    "w": "West",
+}
+
+
+def next_room(dir, current_room):
+    direction = dir + "_to"
+    return getattr(current_room, direction)
+
+
+def move_player(ply, dir):
+    room = next_room(dir, ply.current_room)
+    if room:
+        ply.current_room = room
+        print(
+            f"You move {full_direction[dir]} and find yourself in a new place")
+        return True
+    else:
+        return False
+
 
 # Write a loop that:
 #

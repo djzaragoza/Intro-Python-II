@@ -19,7 +19,7 @@ class Room:
         return self.items
 
     def add_items(self, items):
-        self.items.append(item)
+        self.items.append(items)
         return self.items
 
     def remove_item(self, name):
